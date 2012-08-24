@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace LivePolicy
 {
@@ -7,6 +8,41 @@ namespace LivePolicy
     {
         public DateTime PublishDate { get; set; }
         public int Version { get; set; }
+
+        public void Add(string key, int value)
+        {
+            Add(key, value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public void Add(string key, DateTime value)
+        {
+            Add(key, value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public void Add(string key, bool value)
+        {
+            Add(key, value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public string GetString(string key)
+        {
+            return this[key];
+        }
+
+        public int GetInt(string key)
+        {
+            return Convert.ToInt32(this[key], CultureInfo.InvariantCulture);
+        }
+
+        public DateTime GetDate(string key)
+        {
+            return Convert.ToDateTime(this[key], CultureInfo.InvariantCulture);
+        }
+
+        public bool GetBoolean(string key)
+        {
+            return Convert.ToBoolean(this[key], CultureInfo.InvariantCulture);
+        }
     }
 
     public interface IPolicySource
@@ -37,7 +73,7 @@ namespace LivePolicy
             {
                 PolicyInfo newPolicy;
 
-                if (TryFetchPolicyFromSource(out newPolicy))
+                if (TryFetchPolicy(out newPolicy))
                 {
                     _policyStorage.Write(newPolicy);
                 }
@@ -55,7 +91,7 @@ namespace LivePolicy
             }
         }
 
-        private bool TryFetchPolicyFromSource(out PolicyInfo sourcePolicy)
+        private bool TryFetchPolicy(out PolicyInfo sourcePolicy)
         {
             sourcePolicy = null;
 

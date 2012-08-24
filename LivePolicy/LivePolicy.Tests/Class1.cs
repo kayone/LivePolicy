@@ -95,10 +95,57 @@ namespace LivePolicy.Tests
 
             Subject.Current = fakePolicy;
             Subject.Load().Should().BeFalse();
-            
+
             Subject.Current.Should().Equal(fakePolicy);
         }
 
 
+    }
+
+
+    [TestFixture]
+    public class PolicyInfoFixture
+    {
+
+        private PolicyInfo _fakePolicy;
+
+        [SetUp]
+        public void Setup()
+        {
+            _fakePolicy = new PolicyInfo();
+        }
+
+        [Test]
+        public void should_be_able_to_read_and_write_strings()
+        {
+            _fakePolicy.Add("Key", "Value");
+            _fakePolicy["Key"].Should().Be("Value");
+        }
+
+        [Test]
+        public void should_be_able_to_read_and_write_ints()
+        {
+            _fakePolicy.Add("Key", 1);
+            _fakePolicy.GetInt("Key").Should().Be(1);
+        }
+
+        [Test]
+        public void should_be_able_to_read_and_write_dates()
+        {
+            var time = new DateTime(2001, 1, 3, 5, 6, 9);
+
+            _fakePolicy.Add("Key", time);
+            _fakePolicy.GetDate("Key").Should().Be(time);
+        }
+
+        [Test]
+        public void should_be_able_to_read_and_write_booleans()
+        {
+            _fakePolicy.Add("Key", true);
+            _fakePolicy.GetBoolean("Key").Should().Be(true);
+
+            _fakePolicy.Add("Key2", false);
+            _fakePolicy.GetBoolean("Key2").Should().Be(false);
+        }
     }
 }
