@@ -7,3 +7,5 @@ TestResults
 *_ReSharper*
 */packages/*
 *.suo
+*crunchsolution.cache
+*.DotSettings.user
