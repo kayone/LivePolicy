@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -40,6 +41,15 @@ namespace LivePolicy.Tests
                 .Setup(c => c.FetchPolicy()).Throws<WebException>();
         }
 
+        private void GiveUnavilableStorage()
+        {
+            Mocker.GetMock<IPolicyStorage>()
+                .Setup(c => c.Write(It.IsAny<PolicyInfo>())).Throws<FileNotFoundException>();
+
+            Mocker.GetMock<IPolicyStorage>()
+                .Setup(c => c.Read()).Throws<FileNotFoundException>();
+        }
+
         private void GiveSourcePolicy(PolicyInfo policyInfo)
         {
             Mocker.GetMock<IPolicySource>()
@@ -57,7 +67,7 @@ namespace LivePolicy.Tests
         {
             GiveSourcePolicy(fakePolicy);
 
-            Subject.Load();
+            Subject.Load().Should().BeTrue();
             Subject.Current.Should().Equal(fakePolicy);
 
             Mocker.GetMock<IPolicyStorage>().Verify(c => c.Write(fakePolicy), Times.Once());
@@ -70,11 +80,22 @@ namespace LivePolicy.Tests
             GiveUnavilableSource();
             GiveStoredPolicy(fakePolicy);
 
-            Subject.Load();
+            Subject.Load().Should().BeTrue();
 
-            
+
 
             Mocker.GetMock<IPolicyStorage>().Verify(c => c.Write(It.IsAny<PolicyInfo>()), Times.Never());
+            Subject.Current.Should().Equal(fakePolicy);
+        }
+
+        [Test]
+        public void if_storage_is_not_avilable_load_should_pass()
+        {
+            GiveUnavilableStorage();
+
+            Subject.Current = fakePolicy;
+            Subject.Load().Should().BeFalse();
+            
             Subject.Current.Should().Equal(fakePolicy);
         }
 

@@ -31,20 +31,28 @@ namespace LivePolicy
             _policyStorage = policyStorage;
         }
 
-        public void Load()
+        public bool Load()
         {
-            PolicyInfo newPolicy;
-
-            if (TryFetchPolicyFromSource(out newPolicy))
+            try
             {
-                _policyStorage.Write(newPolicy);
-            }
-            else
-            {
-                newPolicy = _policyStorage.Read();
-            }
+                PolicyInfo newPolicy;
 
-            Current = newPolicy;
+                if (TryFetchPolicyFromSource(out newPolicy))
+                {
+                    _policyStorage.Write(newPolicy);
+                }
+                else
+                {
+                    newPolicy = _policyStorage.Read();
+                }
+
+                Current = newPolicy;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private bool TryFetchPolicyFromSource(out PolicyInfo sourcePolicy)
@@ -62,6 +70,6 @@ namespace LivePolicy
             }
         }
 
-        public PolicyInfo Current { get; private set; }
+        public PolicyInfo Current { get; internal set; }
     }
 }
